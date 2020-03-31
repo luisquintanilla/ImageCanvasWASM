@@ -1,0 +1,34 @@
+﻿@page "/image"
+@inject IJSRuntime JsRuntime
+
+<div class="video-wrap">
+    <video id="video" playsinline autoplay></video>
+</div>
+
+<div class="controller">
+    <button @onclick="Snap">Capture</button>
+</div>
+
+<canvas id="capturedImage" width="640" height="480"></canvas>
+
+@code {
+
+    // Start capturing video
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("Initialize", new Dictionary<string, string>
+    {
+            {"video", "video"}
+        });
+    }
+
+    // Take a picture
+    private async Task Snap()
+    {
+        Console.WriteLine("Taking picture");
+        await JsRuntime.InvokeVoidAsync("Snap", "video", "capturedImage");
+
+        var imageBytes = await JsRuntime.InvokeAsync<string>("GetImageData", "capturedImage","image/jpeg");
+        Console.WriteLine(imageBytes);
+    }
+} 
